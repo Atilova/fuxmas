@@ -1,0 +1,18 @@
+[project]
+name = "fuxmas-mapping-module"
+version = "1.0.0"
+description = "Fuxmas LED pixel-mapping service"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.*",
+    "msgspec==0.*",
+    "numpy==2.*",
+    "opencv-python==4.*",
+    "pydantic==2.*",
+    "pydantic-settings==2.*",
+    "python-magic==0.*",  # Requires install libmagic
+    "python-multipart==0.*",
+    "redis==7.*",
+    "uvicorn==0.*",
+]

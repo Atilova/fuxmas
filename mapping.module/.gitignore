@@ -1,0 +1,8 @@
+__pycache__/
+
+venv/
+.venv/
+
+# Ignore everything in uploads, but keep the .gitkeep file
+uploads/*
+!uploads/.gitkeep
