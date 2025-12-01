@@ -7,4 +7,4 @@ _PASCAL_TO_SNAKE_CASE_PATTERN = re.compile(
 
 
 def from_pascal_to_snake_case(value: str):
-    return _PASCAL_TO_SNAKE_CASE_PATTERN.sub("_", value).lower()
+   return _PASCAL_TO_SNAKE_CASE_PATTERN.sub("_", value).lower()

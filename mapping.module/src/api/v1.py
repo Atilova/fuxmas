@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 from functools import cached_property
 
 from fastapi import (
@@ -10,7 +11,7 @@ from fastapi import (
     Request,
 )
 from fastapi.routing import APIRouter
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from starlette import status
 
 from src.mapping import MappingApp, get_mapping_app
@@ -68,8 +69,19 @@ class MappingFileAdapter:
         return Path(self._file.filename).suffix
 
 
+@router.get("/mapping/file/{file_id}/")
+async def mapping_file(
+    file_id: UUID,
+    mapping_app: MappingApp = Depends(get_mapping_app),
+) -> FileResponse:
+    file_path = await mapping_app.expose_file_port.get_path(file_id)
+    filesystem_path = mapping_app.storage.get_local_filesystem_path(file_path)
+
+    return FileResponse(filesystem_path)
+
+
 @router.post("/mapping/strategy/init/")
-async def map_strategy_init(
+async def mapping_strategy_init(
     file: UploadFile = File(...),
     total_pixels: int = Form(...),
     strategy: MappingStrategy = Form(...),
@@ -85,7 +97,7 @@ async def map_strategy_init(
 
 
 @router.post("/mapping/strategy/read/")
-async def map_strategy_result(
+async def mapping_strategy_result(
     request: mapping_dto.StrategyRead,
     mapping_app: MappingApp = Depends(get_mapping_app),
 ) -> mapping_dto.StrategyReadResult:
@@ -93,7 +105,7 @@ async def map_strategy_result(
 
 
 @router.post("/mapping/strategy/grayLabel/try/")
-async def map_strategy_gray_label_try(
+async def mapping_strategy_gray_label_try(
     request: mapping_dto.StrategyGrayLabelTry,
     mapping_app: MappingApp = Depends(get_mapping_app),
 ) -> mapping_dto.StrategyGrayLabelTryResult:
@@ -101,7 +113,7 @@ async def map_strategy_gray_label_try(
 
 
 @router.post("/mapping/strategy/grayLabel/continue/")
-async def map_strategy_gray_label_continue(
+async def mapping_strategy_gray_label_continue(
     request: mapping_dto.StrategyGrayLabelContinue,
     mapping_app: MappingApp = Depends(get_mapping_app),
 ) -> mapping_dto.StrategyGrayLabelContinueResult:

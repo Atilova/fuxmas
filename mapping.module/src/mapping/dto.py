@@ -45,11 +45,9 @@ class StrategyReadResult(BaseModel):
 
 class StrategyGrayLabelTry(BaseModel):
     class Options(BaseModel):
-        use_tone_pre_processing: bool = True
-
-        use_post_filter: bool = True
-        post_filter_leds_margin: int = 10
-
+        use_tone_filter: bool = True
+        use_score_filter: bool = True
+        score_filter_margin: int = 10
         min_distance: int = Field(14, ge=10, le=30)
         quality_levels: float = Field(0.02, ge=0.01, le=0.3)
 
@@ -58,15 +56,14 @@ class StrategyGrayLabelTry(BaseModel):
 
 
 class StrategyGrayLabelTryResult(BaseModel):
-    frame_url: str
-    led_positions: list[tuple[int, int]]
+    pixels_file_id: UUID
+    pixels_positions: list[tuple[int, int]]
 
 
 class StrategyGrayLabelContinue(BaseModel):
     id: UUID
-    led_positions: list[tuple[int, int]]
+    pixels_positions: list[tuple[int, int]]
 
 
 class StrategyGrayLabelContinueResult(BaseModel):
-    total: int
     positions: list[tuple[int, int]]

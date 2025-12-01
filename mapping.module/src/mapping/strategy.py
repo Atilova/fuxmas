@@ -23,6 +23,7 @@ from src.mapping.entity import StrategyEntity
 class StrategyPortConfig(NamedTuple):
     entity_retention_period: timedelta = timedelta(minutes=7)
     validate_mime_buffer_size: int = 4096
+    download_file_name: str = "download"
 
 
 class StrategyPort:
@@ -49,25 +50,26 @@ class StrategyPort:
         if not strategy.is_supported_mime(mime):
             raise UnsupportedFileMIME()
 
-        await dto.file.seek(0)
-        result_id = uuid4()
-        file_path = await self._storage.download(dto.file, str(result_id))
-
         entity = StrategyEntity(
-            id=result_id,
             status=Status.QUEUED,
             total_pixels=dto.total_pixels,
             strategy=dto.strategy,
-            file_path=file_path,
             positions=[],
         )
 
+        await dto.file.seek(0)
+        downloaded_file_path = await self._storage.download_file(
+            path=entity.path_dir,
+            name=self._config.download_file_name,
+            file=dto.file,
+        )
+
+        await strategy.init(entity, downloaded_file_path)
         await self._repository.save(
             entity, ttl=self._config.entity_retention_period.seconds
         )
-        await strategy.init(entity)
 
-        return StrategyInitResult(id=result_id)
+        return StrategyInitResult(id=entity.id)
 
     async def read(self, dto: StrategyRead) -> StrategyReadResult:
         entity = await self._repository.get(dto.id)
